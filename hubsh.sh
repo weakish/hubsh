@@ -136,9 +136,9 @@ _newPullRequest() {
     local subject
     local body
 
-    if [ -f "$message" ]; then
-        subject=$(sed 1q "$message")
-        body=$(seq -n '3,$p' "$message")
+    if [ -n "$message_file" -a -f "$message_file" ]; then
+        subject=$(sed 1q "$message_file")
+        body=$(sed -n '3,$p' "$message_file")
     else
         remoteBranch=$(echo $head | tr ':' '/')
         subject=$(git log -1 --format=%s $remoteBranch)
@@ -191,53 +191,99 @@ hub_clone() {
     fi
 }
 
-# Usage: hub_create [name=NAME] [other=PARAMETER] ...
-# Note: Give 'name=NAME' before any other parameters.
 hub_create() {
-    local name
+    local name=${name:-$(basename $(pwd))}
 
-    local apiUrl="/$(_hubUser)/repos"
-
-    # `name` is required in GitHub API.
-    if [ $# -eq 0 ]; then
-        name=$(pwd)
+    local description
+    if [ -f "$(git root)/README.md" ]; then
+        # In case there are multiple READMEs, e.g. `README` and `README.md`:
+        readmeFile="$(ls $(git root)/README* | sed 1q)"
+        description="$(sed 1q $readmeFile)"
     else
-        case "$1" in
-            name=*) name="${1:#name=}"
-        esac
-        name=${name:-$(pwd)}
+        description=None
     fi
 
-    echo "name=$name $@" | _request $apiUrl post
+    local homepage=None
+
+    local private='false'
+    local has_issue='true'
+    local has_wiki='true'
+    local has_downloads='true'
+
+    local apiUrl="/user/repos"
+
+    while getopts n:d:u:pIWD option; do
+        case "$option" in
+            n) name="$OPTARG" ;;
+            d) description="$OPTARG" ;;
+            u) homepage="$OPTARG" ;;
+            p) private='yes' ;;
+            I) has_issue='false' ;;
+            W) has_wiki='false' ;;
+            D) has_downloads='false' ;;
+        esac
+    done
+
+    local optionalArgumets=''
+    if [ "$description" != None ]; then
+        optionalArguments="\"description\": \"$description\","
+    else
+        optionalArguments=''
+    fi
+    if [ "$homepage" != None ]; then
+        optionalArguments="$optionalArguments \"homepage\": \"$homepage\","
+    fi
+
+    optionalFlags="\"private\": $private, \"has_issue\": $has_issue, \"has_wiki\": $has_wiki, \"has_downloads\": $has_downloads,"
+
+    _request $apiUrl POST \
+        "{$optionalArguments $optionalFlags \"name\": \"$name\"}"
+
+    # TODO Do not add remote if api request failed.
+    git remote add origin "git@github.com:$(_hubUser)/$name.git"
 }
 
 hub_fork() {
-    ownerRepo
-    if [ $# -eq 0 ]; then
-        ownerRepo=$(_getOwnerRepo)
-    else
-        ownerRepo="$1"
-        hub_clone $ownerRepo
-    fi
+    local ownerRepo=$(_getOriginalRepo)
     local apiUrl="/repos/$ownerRepo/forks"
 
-    _request $apiUrl post
+    _request $apiUrl POST
+    # TODO Do not add remote if api request failed.
+    baseRepo=$(echo -n $ownerRepo | grep -o -E '/.+$' | grep -o -E '[^/]+$')
+    git remote add "$(_hubUser)" "git@github.com:$(_hubUser)/$baseRepo.git"
 }
 
-# Usage: echo optional_message | hub_pull_request [-i issueNumber | -b master ]
+hub_git_to_https() {
+    if (git remote -v | grep -F origin | grep -q -E '[[:space:]]+git://'); then
+        local ownerRepo=$(_getOriginalRepo)
+        local originHttps="https://github.com/$ownerRepo.git"
+        git remote rm origin
+        git remote add origin $originHttps
+    fi
+    if [ $# -gt 0 ]; then
+        if [ "$1" = "-u" ]; then
+            local trackingBranch="${2:-master}"
+            git fetch origin "$trackingBranch"
+            git branch --set-upstream-to=origin/"$trackingBranch" "$trackingBranch"
+        else
+            echo 'Usage: hubsh git-to-https [-u [branch]]'
+        fi
+    fi
+}
+
 hub_pull_request() {
-    ownerRepo=$(_getOwnerRepo)
+    ownerRepo=$(_getOriginalRepo)
     local apiUrl="/repos/$ownerRepo/pulls"
 
-    local base
-    local head
-    local message
-    local issue
+    local base=master
+    local head="$(_hubUser):$(_currentBranch)"
+    local message_file=''
+    local issue=-1
     while getopts b:h:m:i: option; do
         case "$option" in
-            b) base="${OPTARG:-master}" ;;
-            h) head="${OPTARG:-$(_hubUser):$(_currentBranch)}" ;;
-            m) message="$OPTARG" ;;
+            b) base="$OPTARG" ;;
+            h) head="$OPTARG" ;;
+            m) message_file="$OPTARG" ;;
             i) issue="$OPTARG" ;;
         esac
     done
