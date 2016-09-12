@@ -4,7 +4,7 @@ set -e  # errexit
 set -u  # nounset
 
 
-SEMVER=v0.0.0
+VERSION=0.0.0
 
 hub_help() {
 cat<<'END'
@@ -225,7 +225,7 @@ case "$1" in
     fork) hub_fork ;;
     pull-request) hub_pull_request ;;
     whoami) hub_whoami ;;
-    version) echo $SEMVER;;
+    version) echo $VERSION;;
     help) hub_help ;;
     debug) set -x; "$2" ;;
     *) hub_help ;;
