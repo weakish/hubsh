@@ -23,6 +23,14 @@ Auth token is stored in `$HOME/.config/hubsh`.
 END
 }
 
+hub_debug() {
+    set -x
+    export isDebugging='on'
+    local debuggingFunction="$1"
+    shift 1
+    $debuggingFunction "$@"
+}
+
 # Usage: eval `_valueOf variable function`
 _conditionalAssign() {  # (Variable, Function) -> Variable
     local variable="$1"
@@ -57,6 +65,7 @@ _request() {
     GITHUB_API_ROOT='https://api.github.com'
     GITHUB_API_VERSION='Accept: application/vnd.github.v3+json'
 
+    curlDebug=${curlDebug:-sS}
     path="$GITHUB_API_ROOT$path"
 
     case "$method" in
@@ -218,6 +227,7 @@ hub_whoami() {
 }
 
 
+export isDebugging=off
 case "$1" in
     auth) hub_auth ;;
     clone) hub_clone "$2" ;;
@@ -227,6 +237,6 @@ case "$1" in
     whoami) hub_whoami ;;
     version) echo $VERSION;;
     help) hub_help ;;
-    debug) set -x; "$2" ;;
+    debug) shift 1; hub_debug "$@";;
     *) hub_help ;;
 esac
