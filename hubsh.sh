@@ -289,7 +289,7 @@ hub_pull_request() {
             i) issue="$OPTARG" ;;
         esac
     done
-    if [ -n $issue ]; then
+    if [ $issue -lt 0 ]; then
         _newPullRequest
     else
         _convertIssueToPullRequest
