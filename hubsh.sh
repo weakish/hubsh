@@ -96,12 +96,26 @@ _request() {
         "$path"
 }
 
-_getOwnerRepo() {
+_getOriginalRepo() {
     ownerRepo=$(
-        git remote -v | grep -E "github\.com[:/]$(_hubUser)/" |
-            grep -E -o "$(_hubUser)/[^ ]+"
+        git remote -v |
+            grep -m 1 -F origin |
+            cut -f 2 | cut -d ' ' -f 1 |
+            sed -e 's#https://github.com/##' |
+            sed -e 's#git://github.com/##' |
+            sed -e 's/git@github.com://'
     )
-    ownerRepo=${ownerRepo:%.git}
+    ownerRepo=${ownerRepo%.git}
+    echo $ownerRepo
+}
+
+_getOwnerRepo() {
+    local githubUser=$(_hubUser)
+    ownerRepo=$(
+        git remote -v | grep -E "github\.com[:/]$githubUser/" |
+            grep -E -o "$githubUser/[^ ]+"
+    )
+    ownerRepo=${ownerRepo%.git}
     echo ownerRepo
 }
 
