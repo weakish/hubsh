@@ -142,10 +142,12 @@ _newPullRequest() {
     else
         remoteBranch=$(echo $head | tr ':' '/')
         subject=$(git log -1 --format=%s $remoteBranch)
-        body=$(git log -1 --format=body $remoteBranch)
+        body=$(git log -1 --format=%b $remoteBranch)
     fi
-    local diffStat=$(git diff --no-color -M --stat --summary $base $head)
-    body=$(
+    headPrefix="$(_hubUser):"
+    localHead="${head#$headPrefix}"
+    local diffStat="$(git diff --no-color -M --stat --summary $base $localHead)"
+    body="$(
         cat<<END
 $body
 
