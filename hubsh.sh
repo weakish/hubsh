@@ -56,11 +56,13 @@ _errorUnimplemented() {
 # A wrapper of curl.
 # Usage:
 #
-#     _request /api/path
-#     echo 'request body' | _request /api/path post
+#     _request /api/path  # GET
+#     _request /api/path POST '{"json": "value"}'
 _request() {
     local path="$1"
     local method=${2:-GET}
+    local param="${3:-{\}}"
+    local verbosity
 
     GITHUB_API_ROOT='https://api.github.com'
     GITHUB_API_VERSION='Accept: application/vnd.github.v3+json'
@@ -80,11 +82,17 @@ _request() {
         PATCH | patch) requestingPatch=true; writable=true; _errorUnimplemented ;;
     esac
 
-    curl -sS \
+    if [ $isDebugging = 'on' ]; then
+        verbosity=-v
+    else
+        verbosity=-sS
+    fi
+
+    curl "$verbosity" \
         -H "$GITHUB_API_VERSION" \
         -H "Authorization: token $(_authToken)" \
-        ${writable:+--data-binary @-} \
-        -X "$method"
+        ${writable:+--data "$param"} \
+        -X "$method" \
         "$path"
 }
 
