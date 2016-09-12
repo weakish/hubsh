@@ -310,9 +310,10 @@ export isDebugging=off
 case "$1" in
     auth) hub_auth ;;
     clone) hub_clone "$2" ;;
-    create) hub_create "$@" ;;
+    create) shift 1; hub_create "$@" ;;
     fork) hub_fork ;;
-    pull-request) hub_pull_request ;;
+    git-to-https) shift 1; hub_git_to_https "$@";;
+    pull-request) shift 1; hub_pull_request "$@";;
     whoami) hub_whoami ;;
     version) echo $VERSION;;
     help) hub_help ;;
