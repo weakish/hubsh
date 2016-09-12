@@ -127,9 +127,9 @@ _currentBranch() {
     eval `_conditionalAssign currentBranch _getCurrentBranch`
 }
 
-
 _convertIssueToPullRequest() {
-    echo "issue=$issue base=$base head=$head" | _request $apiUrl post
+    _request $apiUrl POST\
+        "{\"issue\": \"$issue\", \"base\": \"$base\", \"head\": \"$head\"}"
 }
 
 _newPullRequest() {
@@ -152,9 +152,18 @@ $body
 ---
 $diffStat
 END
-    )
-    echo "title=$subject base=$base head=$head ${body:+body=$body}" |
-        _request $apiUrl post
+    )"
+    body=$(_jsonify "$body")
+    _request $apiUrl POST \
+        "{\"title\": \"$subject\", \"base\": \"$base\", \"head\": \"$head\", \"body\": \"$body\"}"
+}
+
+# Convert newline to `\n`.
+_jsonify() {
+    local inputString="$1"
+    # Use `\t` (Tab) as intermediate character
+    # because it is not used within HTML elements anyway.
+    echo -n "$inputString" | tr '\n' '\t' | sed 's/\t/\\n/g'
 }
 
 
