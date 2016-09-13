@@ -13,10 +13,25 @@ hubsh -- GitHub API client in sh
 hubsh [ACTION]
 
 Actions:
-clone    supports clonning from `github_user/repo` and `repo` (your own repo)
-whoami   show github username
-version  show version
-help     this help page
+auth         check if github acess token is available
+clone        supports clonning from `github_user/repo` and `repo` (your own repo)
+create       create this repository on GitHub and add GitHub as origin
+fork         make a fork of a remote repository on GitHub and add as remote
+git-to-https convert github original from `git://` to `https://`
+pull-request send a pull request at GitHub
+whoami       show github username
+version      show version
+help         this help page
+
+Options for sub commands:
+clone        [USER/]REPO
+create       [-n NAME] [-d DESCRIPTION] [-u HOMEPAGE] [-p] [-I] [-W] [-D]
+             (p: private, I: disable issue, W: disable wiki, D: disable download)
+git-to-https [-u BRANCH] (also change BRANCH tracking, BRANCH defaults to `master`)
+pull-request [-b BASE_BRANCH] [-h HEAD_BRANCH] [[-m MESSAGE_FILE] | [-i ISSUE]]
+             (If `-m` is supplied, the first line of the file will become the subject,
+             the third line to end of file will become the description. If `-m` is not
+             supplied, message will use the most recent (single) commit message.)
 
 Files:
 Auth token is stored in `$HOME/.config/hubsh`.
@@ -305,18 +320,27 @@ hub_whoami() {
     )
 }
 
+ex_usage() {
+    hub_help
+    exit 64 # command line usage error
+}
 
 export isDebugging=off
-case "$1" in
-    auth) hub_auth ;;
-    clone) hub_clone "$2" ;;
-    create) shift 1; hub_create "$@" ;;
-    fork) hub_fork ;;
-    git-to-https) shift 1; hub_git_to_https "$@";;
-    pull-request) shift 1; hub_pull_request "$@";;
-    whoami) hub_whoami ;;
-    version) echo $VERSION;;
-    help) hub_help ;;
-    debug) shift 1; hub_debug "$@";;
-    *) hub_help ;;
-esac
+
+if [ $# -eq 0 ]; then
+    ex_usage
+else
+    case "$1" in
+        auth) hub_auth ;;
+        clone) hub_clone "$2" ;;
+        create) shift 1; hub_create "$@" ;;
+        fork) hub_fork ;;
+        git-to-https) shift 1; hub_git_to_https "$@";;
+        pull-request) shift 1; hub_pull_request "$@";;
+        whoami) hub_whoami ;;
+        version) echo $VERSION;;
+        -h|--help|help) hub_help ;;
+        debug) shift 1; hub_debug "$@";;
+        *) ex_usage ;;
+    esac
+fi
