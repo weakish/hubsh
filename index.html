@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>hubsh by weakish</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">hubsh</h1>
+      <h2 class="project-tagline">a command line GitHub API client in sh</h2>
+      <a href="https://github.com/weakish/hubsh" class="btn">View on GitHub</a>
+      <a href="https://github.com/weakish/hubsh/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/weakish/hubsh/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+      <h2>
+<a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
+
+<ul>
+<li>clone <code>[USER/]REPO</code>
+</li>
+<li>create</li>
+<li>fork and pull-request</li>
+</ul>
+
+<h2>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Install</h2>
+
+<h3>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h3>
+
+<ul>
+<li>curl</li>
+<li>git</li>
+<li>sh</li>
+</ul>
+
+<h3>
+<a id="with-make" class="anchor" href="#with-make" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>With <code>make</code>
+</h3>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-k">;</span> git clone https://github.com/weakish/hubsh
+<span class="pl-k">;</span> <span class="pl-c1">cd</span> hubsh
+<span class="pl-k">;</span> make</pre></div>
+
+<p>Files will be installed to <code>/usr/local/bin</code>.
+If you want to install other place, edit <code>config.mk</code> before running <code>make</code>.</p>
+
+<p>Makefile is compatible with both GNU make and BSD make.</p>
+
+<h3>
+<a id="with-basher" class="anchor" href="#with-basher" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>With basher</h3>
+
+<div class="highlight highlight-source-shell"><pre><span class="pl-k">;</span> basher install weakish/gister</pre></div>
+
+<h3>
+<a id="manually" class="anchor" href="#manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Manually</h3>
+
+<p>Copy <code>bin/hubsh</code> to <code>$PATH</code>.</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<pre><code>; hubsh --help
+hubsh -- GitHub API client in sh
+
+hubsh [ACTION]
+
+Actions:
+auth         check if github acess token is available
+clone        supports clonning from `github_user/repo` and `repo` (your own repo)
+create       create this repository on GitHub and add GitHub as origin
+fork         make a fork of a remote repository on GitHub and add as remote
+git-to-https convert github original from `git://` to `https://`
+pull-request send a pull request at GitHub
+whoami       show github username
+version      show version
+help         this help page
+
+Options for sub commands:
+clone        [USER/]REPO
+create       [-n NAME] [-d DESCRIPTION] [-u HOMEPAGE] [-p] [-I] [-W] [-D]
+             (p: private, I: disable issue, W: disable wiki, D: disable download)
+git-to-https [-u BRANCH] (also change BRANCH tracking, BRANCH defaults to `master`)
+pull-request [-b BASE_BRANCH] [-h HEAD_BRANCH] [[-m MESSAGE_FILE] | [-i ISSUE]]
+             (If `-m` is supplied, the first line of the file will become the subject,
+             the third line to end of file will become the description. If `-m` is not
+             supplied, message will use the most recent (single) commit message.)
+
+
+Files:
+Auth token is stored in `$HOME/.config/hubsh`.
+</code></pre>
+
+<p>The <code>Auth token</code> is a GitHub personal access token.
+You need to get it from GitHub &gt; Settings.
+<code>hubsh auth</code> will print out a short instruction for getting the token.</p>
+
+<p>You can add alias in <code>.gitconfig</code>, e.g. point <code>git pr</code> to <code>hubsh pull-request</code>.</p>
+
+<h2>
+<a id="hubsh-vs-hub" class="anchor" href="#hubsh-vs-hub" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>hubsh v.s. hub</h2>
+
+<p>hub is in Go, so it is supported on any platform supporting Go.
+hubsh is in sh, so it is supported on any platform supporting curl and sh.</p>
+
+<p>hubsh only implemented a small subset of hub features.
+But there is one new feature <code>git-to-https</code>:
+If some repository is cloned via <code>git://</code>, <code>git-to-https</code> will convert it to <code>https</code>.
+(Useful for insecure network.)</p>
+
+<p><code>hubsh pull-request</code> is different to <code>hub pull-request</code>:</p>
+
+<ul>
+<li>A diffstat is appended to pull request message.</li>
+<li>hubsh will never bring you to an editor,
+it either use a file given by <code>-m</code>, or just the most recent (single) commit.</li>
+<li>hubsh's <code>-m</code> is equivalent to hub's <code>-F</code>, and hubsh has no option for <code>-m MESSAGE</code> in hub.</li>
+<li>hubsh does not support <code>-o</code> and <code>-f</code> in hub.</li>
+</ul>
+
+<p><code>hubsh create</code> is also different:</p>
+
+<ul>
+<li>Instead of <code>hub create [NAME]</code>, use <code>hubsh [-n NAME]</code>.</li>
+<li>hubsh has <code>-I</code>, <code>-W</code>, <code>-D</code> to disable issue, wiki, and downloads.</li>
+<li>If <code>-d</code> is not given, <code>hubsh</code> will use first line of README.</li>
+<li>hubsh does not support create repo under organization yet (pull request welcome).</li>
+</ul>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
+
+<p>0BSD</p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/weakish/hubsh">hubsh</a> is maintained by <a href="https://github.com/weakish">weakish</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+  
+  </body>
+</html>
