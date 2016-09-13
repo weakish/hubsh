@@ -42,7 +42,7 @@ Copy `bin/hubsh` to `$PATH`.
 Usage
 ------
 
-```sh
+```
 ; hubsh --help
 hubsh -- GitHub API client in sh
 
