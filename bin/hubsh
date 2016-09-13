@@ -234,11 +234,11 @@ hub_create() {
 
     local apiUrl="/user/repos"
 
-    while getopts n:d:u:pIWD option; do
+    while getopts n:d:h:pIWD option; do
         case "$option" in
             n) name="$OPTARG" ;;
             d) description="$OPTARG" ;;
-            u) homepage="$OPTARG" ;;
+            h) homepage="$OPTARG" ;;
             p) private='yes' ;;
             I) has_issue='false' ;;
             W) has_wiki='false' ;;

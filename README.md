@@ -99,6 +99,13 @@ If some repository is cloned via `git://`, `git-to-https` will convert it to `ht
 - hubsh's `-m` is equivalent to hub's `-F`, and hubsh has no option for `-m MESSAGE` in hub.
 - hubsh does not support `-o` and `-f` in hub.
 
+`hubsh create` is also different:
+
+- Instead of `hub create [NAME]`, use `hubsh [-n NAME]`.
+- hubsh has `-I`, `-W`, `-D` to disable issue, wiki, and downloads.
+- If `-d` is not given, `hubsh` will use first line of README.
+- hubsh does not support create repo under organization yet (pull request welcome).
+
 License
 --------
 
