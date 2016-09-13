@@ -14,6 +14,7 @@ hubsh [ACTION]
 
 Actions:
 auth         check if github acess token is available
+install      install git aliases
 clone        supports clonning from `github_user/repo` and `repo` (your own repo)
 create       create this repository on GitHub and add GitHub as origin
 fork         make a fork of a remote repository on GitHub and add as remote
@@ -35,6 +36,10 @@ pull-request [-b BASE_BRANCH] [-h HEAD_BRANCH] [[-m MESSAGE_FILE] | [-i ISSUE]]
 
 Files:
 Auth token is stored in `$HOME/.config/hubsh`.
+
+`hubsh install` will install the following aliases:
+clone create fork git-to-https pull-request pr
+If you have already defined aliases above, `hubsh` will keep the original one.
 END
 }
 
@@ -288,6 +293,29 @@ hub_git_to_https() {
     fi
 }
 
+_git_check_alias() {
+    git config --global alias."$1"
+}
+
+_git_add_alias() {
+    local alias_name="$1"
+    local alias_command="$2"
+    if _git_check_alias $alias_name; then
+        echo "alias $alias_name already exist."
+    else
+        git config --global alias."$alias_name" "$alias_command"
+    fi
+}
+
+hub_install_aliases() {
+    _git_add_alias clone "!hubsh clone"
+    _git_add_alias create "!hubsh create"
+    _git_add_alias fork "!hubsh fork"
+    _git_add_alias git-to-https "!hubsh git-to-https"
+    _git_add_alias pull-request "!hubsh pull-request"
+    _git_add_alias pr "!hubsh pull-request"
+}
+
 hub_pull_request() {
     ownerRepo=$(_getOriginalRepo)
     local apiUrl="/repos/$ownerRepo/pulls"
@@ -336,6 +364,7 @@ else
         create) shift 1; hub_create "$@" ;;
         fork) hub_fork ;;
         git-to-https) shift 1; hub_git_to_https "$@";;
+        install) hub_install_aliases ;;
         pull-request) shift 1; hub_pull_request "$@";;
         whoami) hub_whoami ;;
         version) echo $VERSION;;
