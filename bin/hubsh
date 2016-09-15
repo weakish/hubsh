@@ -26,7 +26,7 @@ help         this help page
 
 Options for sub commands:
 clone        [USER/]REPO
-create       [-n NAME] [-d DESCRIPTION] [-u HOMEPAGE] [-p] [-I] [-W] [-D]
+create       [-n NAME] [-d DESCRIPTION] [-h HOMEPAGE] [-p] [-I] [-W] [-D]
              (p: private, I: disable issue, W: disable wiki, D: disable download)
 git-to-https [-u BRANCH] (also change BRANCH tracking, BRANCH defaults to `master`)
 pull-request [-b BASE_BRANCH] [-h HEAD_BRANCH] [[-m MESSAGE_FILE] | [-i ISSUE]]
