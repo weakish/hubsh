@@ -1,7 +1,6 @@
 #!/bin/sh
 
-set -e  # errexit
-set -u  # nounset
+set -e # errexit
 
 
 VERSION=0.0.0
