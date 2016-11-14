@@ -72,6 +72,17 @@ pull-request [-b BASE_BRANCH] [-h HEAD_BRANCH] [[-m MESSAGE_FILE] | [-i ISSUE]]
 
 Files:
 Auth token is stored in `$HOME/.config/hubsh`.
+
+Files:
+Auth token is queried in the following order:
+- Environment variable `$GITHUB_OAUTH_TOKEN`
+- content of file `$GITHUB_OAUTH_FILE`
+- content of file `~/.config/hubsh`
+- content of file `~/.config/hub`
+
+`hubsh install` will install the following aliases:
+clone create fork git-to-https pull-request pr
+If you have already defined aliases above, `hubsh` will keep the original one.
 ```
 
 The `Auth token` is a GitHub personal access token.

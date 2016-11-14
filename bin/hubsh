@@ -35,7 +35,11 @@ pull-request [-b BASE_BRANCH] [-h HEAD_BRANCH] [[-m MESSAGE_FILE] | [-i ISSUE]]
              supplied, message will use the most recent (single) commit message.)
 
 Files:
-Auth token is stored in `$HOME/.config/hubsh`.
+Auth token is queried in the following order:
+- Environment variable `$GITHUB_OAUTH_TOKEN`
+- content of file `$GITHUB_OAUTH_FILE`
+- content of file `~/.config/hubsh`
+- content of file `~/.config/hub`
 
 `hubsh install` will install the following aliases:
 clone create fork git-to-https pull-request pr
@@ -190,8 +194,15 @@ _jsonify() {
 
 
 hub_auth() {
-    cat ${XDG_CONFIG_HOME:-$HOME/.config}/hubsh ||
-    (
+    if [ -n $GITHUB_OAUTH_TOKEN ]; then
+        echo $GITHUB_OAUTH_TOKEN
+    elif [ -f "$GITHUB_OAUTH_FILE" ]; then
+        cat "$GITHUB_OAUTH_FILE";
+    elif [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/hubsh" ]; then
+        cat "${XDG_CONFIG_HOME:-$HOME/.config}/hubsh"
+    elif [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/hub" ]; then # Use token of `hub`.
+        cat "${XDG_CONFIG_HOME:-$HOME/.config}/hub"
+    else
         cat<<'END' >&2
 Error: OAuth token not found.
 https://github.com/settings/tokens
@@ -199,7 +210,7 @@ And paste the token value in
 ~/.config/hubsh
 END
         exit 77  # EX_NOPERM
-    )
+    fi
 }
 
 hub_clone() {
