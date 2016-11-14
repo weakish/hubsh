@@ -36,6 +36,7 @@ pull-request [-b BASE_BRANCH] [-h HEAD_BRANCH] [[-m MESSAGE_FILE] | [-i ISSUE]]
 
 Files:
 Auth token is queried in the following order:
+
 - Environment variable `$GITHUB_OAUTH_TOKEN`
 - content of file `$GITHUB_OAUTH_FILE`
 - content of file `~/.config/hubsh`
