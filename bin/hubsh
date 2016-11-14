@@ -273,8 +273,11 @@ hub_create() {
     _request $apiUrl POST \
         "{$optionalArguments $optionalFlags \"name\": \"$name\"}"
 
-    # TODO Do not add remote if api request failed.
-    git remote add origin "git@github.com:$(_hubUser)/$name.git"
+    if [ $? -eq 0 ]; then
+        git remote add origin "git@github.com:$(_hubUser)/$name.git"
+    else
+        exit $?
+    fi
 }
 
 hub_fork() {
@@ -282,9 +285,13 @@ hub_fork() {
     local apiUrl="/repos/$ownerRepo/forks"
 
     _request $apiUrl POST
-    # TODO Do not add remote if api request failed.
-    baseRepo=$(echo -n $ownerRepo | grep -o -E '/.+$' | grep -o -E '[^/]+$')
-    git remote add "$(_hubUser)" "git@github.com:$(_hubUser)/$baseRepo.git"
+
+    if [ $? -eq 0 ]; then
+        baseRepo=$(echo -n $ownerRepo | grep -o -E '/.+$' | grep -o -E '[^/]+$')
+        git remote add "$(_hubUser)" "git@github.com:$(_hubUser)/$baseRepo.git"
+    else
+        exit $?
+    fi
 }
 
 hub_git_to_https() {
