@@ -115,6 +115,38 @@ If some repository is cloned via `git://`, `git-to-https` will convert it to `ht
 - If `-d` is not given, `hubsh` will use first line of README.
 - hubsh does not support create repo under organization yet (pull request welcome).
 
+gogsh
+-----
+
+There is also an client to gogs server -- `gogsh`.
+`gogsh` is a simplified brother of `hubsh`.
+It supports less actions and options.
+
+### Usage
+
+```
+gogsh -- Gogs API client in sh
+
+gogsh [ACTION]
+
+Actions:
+auth         check if gogs acess token is available
+clone        supports clonning from `gogs_user/repo` and `repo` (your own repo)
+create       create this repository on GitHub and add GitHub as origin
+whoami       show gogsh username (specified in `$GOGS_USER`)
+version      show version
+help         this help page
+
+gogs server is specified in `$GOGS_SERVER`.
+If not specified, it defaults to `http://127.0.0.1:3000`.
+
+Auth token is queried in the following order:
+
+- Environment variable `$GOGS_OAUTH_TOKEN`
+- content of file `$GOGS_OAUTH_FILE`
+- content of file `~/.config/gogsh`
+```
+
 License
 --------
 

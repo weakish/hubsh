@@ -1,0 +1,115 @@
+#!/bin/sh
+
+set -e  # errexit
+
+
+VERSION=0.0.0
+
+gogsh_help() {
+cat<<'END'
+gogsh -- Gogs API client in sh
+
+gogsh [ACTION]
+
+Actions:
+auth         check if gogs acess token is available
+clone        supports clonning from `gogs_user/repo` and `repo` (your own repo)
+create       create this repository on GitHub and add GitHub as origin
+whoami       show gogsh username (specified in `$GOGS_USER`)
+version      show version
+help         this help page
+
+gogs server is specified in `$GOGS_SERVER`.
+If not specified, it defaults to `http://127.0.0.1:3000`.
+
+Auth token is queried in the following order:
+
+- Environment variable `$GOGS_OAUTH_TOKEN`
+- content of file `$GOGS_OAUTH_FILE`
+- content of file `~/.config/gogsh`
+END
+}
+
+ex_usage() {
+    gogsh_help
+    exit 64 # command line usage error
+}
+
+readonly gogs_host=${GOGS_SERVER:-http://127.0.0.1:3000}
+
+
+gogsh_whoami() {
+    if [ -n $GOGS_USER ]; then
+        echo $GOGS_USER
+    else
+        echo 'We do not know your username on gogs.'
+        echo 'Specify it in environment variable $GOGS_USER'
+        exit 67  # EX_NOUSER
+    fi
+}
+
+gogsh_auth() {
+    if [ -n "$GOGS_OAUTH_TOKEN" ]; then
+        echo "$GOGS_OAUTH_TOKEN"
+    elif [ -f "$GOGS_OAUTH_FILE" ]; then
+        cat "$GOGS_OAUTH_FILE";
+    elif [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/gogsh" ]; then
+        cat "${XDG_CONFIG_HOME:-$HOME/.config}/gogsh"
+    else
+        cat<<'END'
+Error: OAuth token not found.
+http://127.0.0.1:3000/user/settings/applications
+And paste the token value in
+~/.config/gogsh
+END
+        exit 77  # EX_NOPERM
+    fi
+}
+
+
+
+gogsh_clone() {
+    if [ -d "$1" ]; then
+        git clone "$1";
+    else
+        case "$1" in
+            */*) git clone $gogs_host/"$1".git ;;
+            *) git clone $gogs_host/$(gogsh_whoami)/"$1".git ;;
+        esac
+    fi
+}
+
+gogsh_create() {
+    local name=$(basename $(pwd))
+    local apiUrl="/user/repos"
+    readonly gogsApiRoot="$gogs_host/api/v1"
+    readonly gogsApiPath="$gogsApiRoot$apiUrl"
+
+    # Note the difference with GitHub.
+    # GitHub uses `{field: name}`, while gogs uses `field=name`.
+    curl -H "Authorization: token $(gogsh_auth)" \
+            --data "name=$name" \
+            -X 'POST' \
+            $gogsApiPath
+
+    if [ $? -eq 0 ]; then
+        git remote add origin "$gogs_host/$(gogsh_whoami)/$name.git"
+    else
+        exit $?
+    fi
+}
+
+
+if [ $# -eq 0 ]; then
+    ex_usage
+else
+    case "$1" in
+        auth) gogsh_auth ;;
+        clone) gogsh_clone "$2" ;;
+        create) gogsh_create ;;
+        whoami) gogsh_whoami ;;
+        version) echo $VERSION;;
+        -h|--help|help) gogsh_help ;;
+        *) ex_usage ;;
+    esac
+fi
