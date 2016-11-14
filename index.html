@@ -1,25 +1,46 @@
-<!DOCTYPE html>
-<html lang="en-us">
+<!doctype html>
+<html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>hubsh by weakish</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-dark.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
   <body>
-    <section class="page-header">
-      <h1 class="project-name">hubsh</h1>
-      <h2 class="project-tagline">a command line GitHub API client in sh</h2>
-      <a href="https://github.com/weakish/hubsh" class="btn">View on GitHub</a>
-      <a href="https://github.com/weakish/hubsh/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/weakish/hubsh/tarball/master" class="btn">Download .tar.gz</a>
-    </section>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/weakish/hubsh">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/weakish/hubsh/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/weakish/hubsh/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <section class="main-content">
-      <h2>
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>hubsh</h1>
+          <p>command line GitHub/gogs API client in sh</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/weakish">weakish</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <p>hubsh is a command line GitHub API client in sh</p>
+
+<h2>
 <a id="features" class="anchor" href="#features" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Features</h2>
 
 <ul>
@@ -62,7 +83,7 @@ If you want to install other place, edit <code>config.mk</code> before running <
 <h3>
 <a id="manually" class="anchor" href="#manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Manually</h3>
 
-<p>Copy <code>bin/hubsh</code> to <code>$PATH</code>.</p>
+<p>Copy <code>bin/hubsh</code> and <code>bin/gogsh</code> to <code>$PATH</code>.</p>
 
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
@@ -93,9 +114,18 @@ pull-request [-b BASE_BRANCH] [-h HEAD_BRANCH] [[-m MESSAGE_FILE] | [-i ISSUE]]
              the third line to end of file will become the description. If `-m` is not
              supplied, message will use the most recent (single) commit message.)
 
-
 Files:
-Auth token is stored in `$HOME/.config/hubsh`.
+
+Auth token is queried in the following order:
+
+- Environment variable `$GITHUB_OAUTH_TOKEN`
+- content of file `$GITHUB_OAUTH_FILE`
+- content of file `~/.config/hubsh`
+- content of file `~/.config/hub`
+
+`hubsh install` will install the following aliases:
+clone create fork git-to-https pull-request pr
+If you have already defined aliases above, `hubsh` will keep the original one.
 </code></pre>
 
 <p>The <code>Auth token</code> is a GitHub personal access token.
@@ -135,18 +165,45 @@ it either use a file given by <code>-m</code>, or just the most recent (single) 
 </ul>
 
 <h2>
+<a id="gogsh" class="anchor" href="#gogsh" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>gogsh</h2>
+
+<p>There is also an client to gogs server -- <code>gogsh</code>.
+<code>gogsh</code> is a simplified brother of <code>hubsh</code>.
+It supports less actions and options.</p>
+
+<h3>
+<a id="usage-1" class="anchor" href="#usage-1" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h3>
+
+<pre><code>gogsh -- Gogs API client in sh
+
+gogsh [ACTION]
+
+Actions:
+auth         check if gogs acess token is available
+clone        supports clonning from `gogs_user/repo` and `repo` (your own repo)
+create       create this repository on GitHub and add GitHub as origin
+whoami       show gogsh username (specified in `$GOGS_USER`)
+version      show version
+help         this help page
+
+gogs server is specified in `$GOGS_SERVER`.
+If not specified, it defaults to `http://127.0.0.1:3000`.
+
+Auth token is queried in the following order:
+
+- Environment variable `$GOGS_OAUTH_TOKEN`
+- content of file `$GOGS_OAUTH_FILE`
+- content of file `~/.config/gogsh`
+</code></pre>
+
+<h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
 
 <p>0BSD</p>
+      </section>
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/weakish/hubsh">hubsh</a> is maintained by <a href="https://github.com/weakish">weakish</a>.</span>
-
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
-      </footer>
-
-    </section>
-
-  
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
   </body>
 </html>
