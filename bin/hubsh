@@ -195,8 +195,8 @@ _jsonify() {
 
 
 hub_auth() {
-    if [ -n $GITHUB_OAUTH_TOKEN ]; then
-        echo $GITHUB_OAUTH_TOKEN
+    if [ -n "$GITHUB_OAUTH_TOKEN" ]; then
+        echo "$GITHUB_OAUTH_TOKEN"
     elif [ -f "$GITHUB_OAUTH_FILE" ]; then
         cat "$GITHUB_OAUTH_FILE";
     elif [ -f "${XDG_CONFIG_HOME:-$HOME/.config}/hubsh" ]; then
