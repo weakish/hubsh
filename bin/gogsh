@@ -80,6 +80,11 @@ gogsh_clone() {
 }
 
 gogsh_create() {
+    if [ -n "$1"  ]; then
+        mkdir -p "$1"
+        cd "$1"
+        git init
+    fi
     local name=$(basename $(pwd))
     local apiUrl="/user/repos"
     readonly gogsApiRoot="$gogs_host/api/v1"
@@ -106,7 +111,7 @@ else
     case "$1" in
         auth) gogsh_auth ;;
         clone) gogsh_clone "$2" ;;
-        create) gogsh_create ;;
+        create) gogsh_create "$2";;
         whoami) gogsh_whoami ;;
         version) echo $VERSION;;
         -h|--help|help) gogsh_help ;;
