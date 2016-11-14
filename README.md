@@ -37,7 +37,7 @@ Makefile is compatible with both GNU make and BSD make.
 
 ### Manually
 
-Copy `bin/hubsh` to `$PATH`.
+Copy `bin/hubsh` and `bin/gogsh` to `$PATH`.
 
 Usage
 ------
@@ -69,12 +69,10 @@ pull-request [-b BASE_BRANCH] [-h HEAD_BRANCH] [[-m MESSAGE_FILE] | [-i ISSUE]]
              the third line to end of file will become the description. If `-m` is not
              supplied, message will use the most recent (single) commit message.)
 
-
 Files:
-Auth token is stored in `$HOME/.config/hubsh`.
 
-Files:
 Auth token is queried in the following order:
+
 - Environment variable `$GITHUB_OAUTH_TOKEN`
 - content of file `$GITHUB_OAUTH_FILE`
 - content of file `~/.config/hubsh`
