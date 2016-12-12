@@ -42,7 +42,7 @@ Auth token is queried in the following order:
 - content of file `~/.config/hub`
 
 `hubsh install` will install the following aliases:
-clone create fork git-to-https pull-request pr
+create fork get git-to-https pull-request pr
 If you have already defined aliases above, `hubsh` will keep the original one.
 END
 }
@@ -326,9 +326,11 @@ _git_add_alias() {
 }
 
 hub_install_aliases() {
-    _git_add_alias clone "!hubsh clone"
     _git_add_alias create "!hubsh create"
     _git_add_alias fork "!hubsh fork"
+    # Cannot shadow existing git command,
+    # so use `get` instead.
+    _git_add_alias get "!hubsh clone"
     _git_add_alias git-to-https "!hubsh git-to-https"
     _git_add_alias pull-request "!hubsh pull-request"
     _git_add_alias pr "!hubsh pull-request"

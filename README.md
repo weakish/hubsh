@@ -79,7 +79,7 @@ Auth token is queried in the following order:
 - content of file `~/.config/hub`
 
 `hubsh install` will install the following aliases:
-clone create fork git-to-https pull-request pr
+create fork git-to-https get pull-request pr
 If you have already defined aliases above, `hubsh` will keep the original one.
 ```
 
