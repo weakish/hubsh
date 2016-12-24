@@ -79,6 +79,11 @@ gogsh_clone() {
     fi
 }
 
+ssh_prefix() {
+    local ssh_host=$(echo $gogs_host | grep -E -o '//[^:]+' | grep -E -o '[^/]+')
+    echo "gogs@$ssh_host:$(gogsh_whoami)"
+}
+
 gogsh_create() {
     if [ -n "$1"  ]; then
         mkdir -p "$1"
@@ -106,10 +111,10 @@ gogsh_create() {
                     echo "$remote_name already exist. Skip adding it."
                 fi
             else
-                git remote add gogs "$gogs_host/$(gogsh_whoami)/$name.git"
+                git remote add gogs "$(ssh_prefix)/$name.git"
             fi
         else
-            git remote add origin "$gogs_host/$(gogsh_whoami)/$name.git"
+            git remote add origin "$(ssh_prefix)/$name.git"
         fi
     else
         exit $?
