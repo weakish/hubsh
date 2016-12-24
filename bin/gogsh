@@ -98,7 +98,19 @@ gogsh_create() {
             $gogsApiPath
 
     if [ $? -eq 0 ]; then
-        git remote add origin "$gogs_host/$(gogsh_whoami)/$name.git"
+        if (git remote get-url origin > /dev/null 2>&1); then
+            if (git remote get-url gogs > /dev/null 2>&1); then
+                echo 'Both `origin` and `gogs` already exist.'
+                read -p 'Please provide an remote name:' remote_name
+                if (git remote get-url remote_name > /dev/null 2>&1); then
+                    echo "$remote_name already exist. Skip adding it."
+                fi
+            else
+                git remote add gogs "$gogs_host/$(gogsh_whoami)/$name.git"
+            fi
+        else
+            git remote add origin "$gogs_host/$(gogsh_whoami)/$name.git"
+        fi
     else
         exit $?
     fi
