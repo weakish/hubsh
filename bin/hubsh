@@ -157,6 +157,10 @@ _convertIssueToPullRequest() {
 }
 
 _newPullRequest() {
+    local base="$1"
+    local head="$2"
+    local message_file="$3"
+
     local subject
     local body
 
@@ -164,9 +168,25 @@ _newPullRequest() {
         subject=$(sed 1q "$message_file")
         body=$(sed -n '3,$p' "$message_file")
     else
-        remoteBranch=$(echo $head | tr ':' '/')
-        subject=$(git log -1 --format=%s $remoteBranch)
-        body=$(git log -1 --format=%b $remoteBranch)
+        local distance="$(branch_distance "$base" "$head")"
+        case "$distance" in
+            0)
+                echo "Warn: nothing new compared to the base branch!"
+                echo "Do you forget to commit new changes?"
+                exit 0
+                ;;
+            1)
+                remoteBranch=$(echo $head | tr ':' '/')
+                subject=$(git log -1 --format=%s $remoteBranch)
+                body=$(git log -1 --format=%b $remoteBranch)
+                ;;
+            *)
+                echo "There are more than one new commits against the base branch."
+                echo "Please write pull-request message in a file,"
+                echo "and rerun `hubsh pull-request` with `-m FILE`."
+                exit 0
+                ;;
+        esac
     fi
     headPrefix="$(_hubUser):"
     localHead="${head#$headPrefix}"
@@ -336,6 +356,13 @@ hub_install_aliases() {
     _git_add_alias pr "!hubsh pull-request"
 }
 
+branch_distance() {
+    local base="$1"
+    local head=$(echo "$2" | tr ':' '/')
+
+    git rev-list "$head"..."$base" | wc -l
+}
+
 hub_pull_request() {
     ownerRepo=$(_getOriginalRepo)
     local apiUrl="/repos/$ownerRepo/pulls"
@@ -353,7 +380,7 @@ hub_pull_request() {
         esac
     done
     if [ $issue -lt 0 ]; then
-        _newPullRequest
+        _newPullRequest "$base" "$head" "$message_file"
     else
         _convertIssueToPullRequest
     fi
