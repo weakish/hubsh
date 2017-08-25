@@ -89,8 +89,8 @@ You need to get it from GitHub > Settings.
 
 You can add alias in `.gitconfig`, e.g. point `git pr` to `hubsh pull-request`.
 
-hubsh v.s. hub
---------------
+hubsh versus hub
+----------------
 
 hub is in Go, so it is supported on any platform supporting Go.
 hubsh is in sh, so it is supported on any platform supporting curl and sh.
@@ -104,7 +104,7 @@ If some repository is cloned via `git://`, `git-to-https` will convert it to `ht
 
 - A diffstat is appended to pull request message.
 - hubsh will never bring you to an editor,
-  it either use a file given by `-m`, or just the most recent (single) commit.
+  it either use a file given by `-m`, or just the most recent (single) commit message.
 - hubsh's `-m` is equivalent to hub's `-F`, and hubsh has no option for `-m MESSAGE` in hub.
 - hubsh does not support `-o` and `-f` in hub.
 
