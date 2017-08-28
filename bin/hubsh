@@ -50,7 +50,7 @@ END
 hub_debug() {
     set -x
     export isDebugging='on'
-    local debuggingFunction="$1"
+    local debuggingFunction="hub_$(echo $1 | tr '-' '_')"
     shift 1
     $debuggingFunction "$@"
 }
