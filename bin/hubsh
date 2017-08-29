@@ -190,7 +190,7 @@ _newPullRequest() {
             *)
                 echo "There are more than one new commits against the base branch."
                 echo "Please write pull-request message in a file,"
-                echo "and rerun `hubsh pull-request` with `-m FILE`."
+                echo 'and rerun `hubsh pull-request` with `-m FILE`.'
                 exit 0
                 ;;
         esac
