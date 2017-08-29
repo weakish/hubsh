@@ -171,8 +171,8 @@ _newPullRequest() {
         local distance="$(branch_distance "$base" "$head")"
         case "$distance" in
             0)
-                echo "Warn: nothing new compared to the base branch!"
-                echo "Do you forget to commit new changes?"
+                echo 'Warn: nothing new compared to the base branch!'
+                echo 'Do you forget to commit new changes?'
                 exit 0
                 ;;
             1)
@@ -180,16 +180,16 @@ _newPullRequest() {
                 subject=$(git log -1 --format=%s $remoteBranch | sed -r 's/"/\"/g')
                 body=$(git log -1 --format=%b $remoteBranch | sed -r 's/"/\"/g')
                 if [ -z "$subject" ]; then
-                    echo "Error: recent commit message has an empty subject."
+                    echo 'Error: recent commit message has an empty subject.'
                     exit 64
                 elif [ -z "$body" ]; then
-                    echo "Error: recent commit message has an empty body."
+                    echo 'Error: recent commit message has an empty body.'
                     exit 64
                 fi
                 ;;
             *)
-                echo "There are more than one new commits against the base branch."
-                echo "Please write pull-request message in a file,"
+                echo 'There are more than one new commits against the base branch.'
+                echo 'Please write pull-request message in a file,'
                 echo 'and rerun `hubsh pull-request` with `-m FILE`.'
                 exit 0
                 ;;
