@@ -165,8 +165,8 @@ _newPullRequest() {
     local body
 
     if [ -n "$message_file" -a -f "$message_file" ]; then
-        subject=$(sed 1q "$message_file")
-        body=$(sed -n '3,$p' "$message_file")
+        subject=$(sed 1q "$message_file" | sed -r 's/"/\"/g')
+        body=$(sed -n '3,$p' "$message_file" | sed -r 's/"/\"/g')
     else
         local distance="$(branch_distance "$base" "$head")"
         case "$distance" in
@@ -177,8 +177,8 @@ _newPullRequest() {
                 ;;
             1)
                 remoteBranch=$(echo $head | tr ':' '/')
-                subject=$(git log -1 --format=%s $remoteBranch)
-                body=$(git log -1 --format=%b $remoteBranch)
+                subject=$(git log -1 --format=%s $remoteBranch | sed -r 's/"/\"/g')
+                body=$(git log -1 --format=%b $remoteBranch | sed -r 's/"/\"/g')
                 ;;
             *)
                 echo "There are more than one new commits against the base branch."
