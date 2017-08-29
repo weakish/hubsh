@@ -179,6 +179,13 @@ _newPullRequest() {
                 remoteBranch=$(echo $head | tr ':' '/')
                 subject=$(git log -1 --format=%s $remoteBranch | sed -r 's/"/\"/g')
                 body=$(git log -1 --format=%b $remoteBranch | sed -r 's/"/\"/g')
+                if [ -z "$subject" ]; then
+                    echo "Error: recent commit message has an empty subject."
+                    exit 64
+                elif [ -z "$body" ]; then
+                    echo "Error: recent commit message has an empty body."
+                    exit 64
+                fi
                 ;;
             *)
                 echo "There are more than one new commits against the base branch."
