@@ -118,9 +118,19 @@ If some repository is cloned via `git://`, `git-to-https` will convert it to `ht
 gogsh
 -----
 
-There is also an client to gogs server -- `gogsh`.
+There is also a client to gogs server -- `gogsh`.
 `gogsh` is a simplified brother of `hubsh`.
-It supports less actions and options.
+It supports fewer actions and options.
+
+gh
+--
+
+hubsh was written years before GitHub introduced [gh] as its official command line tool.
+Previously, the official tool for GitHub is `hub`, first written in Ruby, then in Go.
+I do not use hubsh anymore.
+I switched to [gh].
+
+[gh]: https://github.com/cli/cli
 
 ### Usage
 
